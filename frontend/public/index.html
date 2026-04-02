@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" href="%PUBLIC_URL%/favicon.ico" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&family=Inter:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+      rel="stylesheet"
+    />
+    <script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              primary: "#00425e",
+              "on-tertiary": "#ffffff",
+              "on-error": "#ffffff",
+              "surface-bright": "#f8fafb",
+              "surface-container-highest": "#e1e3e4",
+              "primary-fixed-dim": "#8ecef7",
+              "on-secondary-container": "#4e6874",
+              "surface-container-high": "#e6e8e9",
+              "inverse-on-surface": "#eff1f2",
+              "inverse-primary": "#8ecef7",
+              "on-background": "#191c1d",
+              "on-surface-variant": "#40484e",
+              outline: "#70787e",
+              "secondary-fixed-dim": "#afcbd8",
+              "on-primary-fixed": "#001e2d",
+              "surface-container-low": "#f2f4f5",
+              "on-primary": "#ffffff",
+              "on-error-container": "#93000a",
+              "surface-variant": "#e1e3e4",
+              "on-tertiary-fixed": "#00201c",
+              "on-secondary": "#ffffff",
+              tertiary: "#00463e",
+              error: "#ba1a1a",
+              "surface-tint": "#176589",
+              "error-container": "#ffdad6",
+              "inverse-surface": "#2e3132",
+              secondary: "#48626e",
+              "on-primary-container": "#91d1fb",
+              "tertiary-fixed-dim": "#70d8c8",
+              "primary-fixed": "#c6e7ff",
+              "on-tertiary-fixed-variant": "#005048",
+              "on-surface": "#191c1d",
+              "surface-container": "#eceeef",
+              "secondary-container": "#cbe7f5",
+              "outline-variant": "#c0c7ce",
+              "on-tertiary-container": "#74dbcb",
+              "on-primary-fixed-variant": "#004c6b",
+              surface: "#f8fafb",
+              "primary-container": "#005b7f",
+              "tertiary-container": "#006056",
+              background: "#f8fafb",
+              "on-secondary-fixed": "#021f29",
+              "tertiary-fixed": "#8df5e4",
+              "surface-container-lowest": "#ffffff",
+            },
+            fontFamily: {
+              headline: ["Manrope"],
+              body: ["Inter"],
+              label: ["Inter"],
+            },
+            borderRadius: { DEFAULT: "0.25rem", lg: "0.5rem", xl: "0.75rem", full: "9999px" },
+          },
+        },
+      };
+    </script>
+    <style>
+      .material-symbols-outlined {
+        font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 24;
+      }
+      body {
+        font-family: "Inter", sans-serif;
+        background-color: #f8fafb;
+        min-height: max(884px, 100dvh);
+      }
+      h1,
+      h2,
+      h3 {
+        font-family: "Manrope", sans-serif;
+      }
+    </style>
+    <meta name="theme-color" content="#000000" />
+    <meta
+      name="description"
+      content="Web site created using create-react-app"
+    />
+    <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo192.png" />
+    <!--
+      manifest.json provides metadata used when your web app is installed on a
+      user's mobile device or desktop. See https://developers.google.com/web/fundamentals/web-app-manifest/
+    -->
+    <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
+    <!--
+      Notice the use of %PUBLIC_URL% in the tags above.
+      It will be replaced with the URL of the `public` folder during the build.
+      Only files inside the `public` folder can be referenced from the HTML.
+
+      Unlike "/favicon.ico" or "favicon.ico", "%PUBLIC_URL%/favicon.ico" will
+      work correctly both with client-side routing and a non-root public URL.
+      Learn how to configure a non-root public URL by running `npm run build`.
+    -->
+    <title>React App</title>
+  </head>
+  <body>
+    <noscript>You need to enable JavaScript to run this app.</noscript>
+    <div id="root"></div>
+    <!--
+      This HTML file is a template.
+      If you open it directly in the browser, you will see an empty page.
+
+      You can add webfonts, meta tags, or analytics to this file.
+      The build step will place the bundled scripts into the <body> tag.
+
+      To begin the development, run `npm start` or `yarn start`.
+      To create a production bundle, use `npm run build` or `yarn build`.
+    -->
+  </body>
+</html>
