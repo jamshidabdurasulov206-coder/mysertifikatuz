@@ -1,0 +1,26 @@
+                                            Table "public.attempts"
+      Column       |            Type             | Collation | Nullable |               Default                
+-------------------+-----------------------------+-----------+----------+--------------------------------------
+ id                | integer                     |           | not null | nextval('attempts_id_seq'::regclass)
+ test_id           | integer                     |           |          | 
+ answers           | jsonb                       |           | not null | 
+ score             | integer                     |           | not null | 
+ created_at        | timestamp without time zone |           |          | CURRENT_TIMESTAMP
+ status            | character varying(20)       |           |          | 'pending'::character varying
+ user_id           | integer                     |           |          | 
+ is_reviewed       | boolean                     |           |          | false
+ written_scores    | jsonb                       |           |          | 
+ subject_name      | character varying(255)      |           |          | 
+ is_published      | boolean                     |           |          | false
+ final_score       | double precision            |           |          | 0
+ z_score           | numeric                     |           |          | 
+ t_score           | numeric                     |           |          | 
+ standard_ball     | numeric                     |           |          | 
+ level             | character varying(10)       |           |          | 
+ final_theta_score | numeric                     |           |          | 
+Indexes:
+    "attempts_pkey" PRIMARY KEY, btree (id)
+Foreign-key constraints:
+    "attempts_test_id_fkey" FOREIGN KEY (test_id) REFERENCES tests(id) ON DELETE CASCADE
+    "fk_user_attempts" FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+

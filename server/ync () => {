@@ -1,0 +1,12 @@
+ id |              username               |             email             | role  
+----+-------------------------------------+-------------------------------+-------
+  2 | admin                               | admin@example.com             | admin
+ 24 | Jamshid abdurasulov jahongir o'g'li | jamshidabdurasulov2@gmail.com | user
+ 25 | ytyrtyr rtrt                        | rtrtr@fdfdfdfdfd              | user
+ 26 | defe fefe                           | Jamshidabdurasulov2@gmail.com | user
+ 27 | Smoke User                          | smoke1775093917@example.com   | user
+ 30 | Smoke 1775094025 User               | smoke1775094025@example.com   | user
+ 31 | Smoke 1775094062 User               | smoke1775094062@example.com   | user
+ 32 | Flow 1775094145 User                | flow1775094145@example.com    | user
+(8 rows)
+

@@ -1,0 +1,20 @@
+                                         Table "public.users"
+    Column    |            Type             | Collation | Nullable |              Default              
+--------------+-----------------------------+-----------+----------+-----------------------------------
+ id           | integer                     |           | not null | nextval('users_id_seq'::regclass)
+ username     | character varying(255)      |           | not null | 
+ email        | character varying(255)      |           | not null | 
+ password     | character varying(255)      |           | not null | 
+ role         | character varying(50)       |           |          | 'user'::character varying
+ created_at   | timestamp without time zone |           |          | CURRENT_TIMESTAMP
+ full_name    | character varying(255)      |           |          | 
+ verify_token | character varying(255)      |           |          | 
+ reset_token  | character varying(255)      |           |          | 
+Indexes:
+    "users_pkey" PRIMARY KEY, btree (id)
+    "users_email_key" UNIQUE CONSTRAINT, btree (email)
+    "users_username_key" UNIQUE CONSTRAINT, btree (username)
+Referenced by:
+    TABLE "attempts" CONSTRAINT "fk_user_attempts" FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+    TABLE "test_sessions" CONSTRAINT "test_sessions_user_id_fkey" FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+
