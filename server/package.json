@@ -1,13 +1,18 @@
 {
   "name": "server",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "server.js",
   "scripts": {
     "start": "node src/server.js",
     "dev": "nodemon src/server.js",
     "migrate": "node migrate.js",
     "migrate:baseline": "node migrate.js --baseline-existing",
     "migrate:continue": "node migrate.js --continue-on-error",
+    "migrate:cpanel": "node --no-experimental-fetch migrate.js",
+    "migrate:cpanel:baseline": "node --no-experimental-fetch migrate.js --baseline-existing",
+    "migrate:cpanel:continue": "node --no-experimental-fetch migrate.js --continue-on-error",
+    "seed": "node scripts/seed.js",
+    "seed:cpanel": "node --no-experimental-fetch scripts/seed.js",
     "test": "jest"
   },
   "keywords": [],

@@ -1,7 +1,6 @@
 const express = require("express");
 const cors = require("cors");
 const path = require("path");
-const fs = require("fs");
 const app = express();
 
 const trustProxyEnv = process.env.TRUST_PROXY;
@@ -64,15 +63,8 @@ const aiLimiter = rateLimit({
 
 app.use(express.json());
 app.use(globalLimiter);
-app.use(express.static(path.join(__dirname, "../public")));
 app.use("/uploads", express.static(path.join(__dirname, "../uploads")));
 app.get("/favicon.ico", (_req, res) => res.status(204).end());
-
-// Debug: log incoming requests (temporary)
-app.use((req, res, next) => {
-  console.log(`[req] ${req.method} ${req.originalUrl}`);
-  next();
-});
 
 // 2. Oddiy tekshiruv yo'lagi
 app.get("/", (req, res) => {
@@ -109,15 +101,6 @@ const logger = require("./utils/logger");
 app.use((err, req, res, next) => {
   logger.error("Unhandled Error middleware:", err);
   res.status(500).json({ error: "Server ichki xatosi!" });
-});
-
-// React Router bilan muammosiz ishlash uchun
-const appIndexPath = path.join(__dirname, "../public/index.html");
-app.get(/^(.*)$/, (req, res) => {
-  if (fs.existsSync(appIndexPath)) {
-    return res.sendFile(appIndexPath);
-  }
-  return res.status(404).json({ message: "Not Found" });
 });
 
 module.exports = app;                                                                                                                                                                                                                                               
