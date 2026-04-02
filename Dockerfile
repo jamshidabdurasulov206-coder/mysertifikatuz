@@ -1,53 +1,43 @@
-# Dockerfile
-# Production-ready Dockerfile is multi-stage
-
-# Stage 1: Build
+# Stage 1: Build frontend assets
 FROM node:20-alpine AS builder
 
 WORKDIR /app
 
-# Server package.json
 COPY server/package*.json ./server/
 WORKDIR /app/server
 RUN npm ci
 
 WORKDIR /app
-# Frontend package.json
 COPY frontend/package*.json ./frontend/
 WORKDIR /app/frontend
-# Add legacy peer deps if React deps conflict
-RUN npm install --legacy-peer-deps
+RUN npm ci --legacy-peer-deps
 
 WORKDIR /app
 COPY . .
 
-# Build frontend
 WORKDIR /app/frontend
 RUN npm run build
 
-# Stage 2: Production Server
+# Stage 2: Production runtime
 FROM node:20-alpine AS runner
 
 WORKDIR /app
-
-# Set node env
 ENV NODE_ENV=production
 
-# Copy server code and node_modules
-COPY --from=builder /app/server/package*.json ./server/
-COPY --from=builder /app/server/node_modules ./server/node_modules
-COPY --from=builder /app/server/src ./server/src
-COPY --from=builder /app/server/utils ./server/utils
-COPY --from=builder /app/server/migrations ./server/migrations
-COPY --from=builder /app/server/migrate.js ./server/
-
-# Copy built frontend output to serve it statically from backend
-COPY --from=builder /app/frontend/build ./server/public
-
+COPY server/package*.json ./server/
 WORKDIR /app/server
+RUN npm ci --omit=dev
+
+COPY --from=builder /app/server/src ./src
+COPY --from=builder /app/server/migrations ./migrations
+COPY --from=builder /app/server/migrate.js ./migrate.js
+COPY --from=builder /app/server/createSupportTable.js ./createSupportTable.js
+
+RUN mkdir -p /app/server/public /app/server/uploads/receipts
+COPY --from=builder /app/frontend/build ./public
+
+ENV PORT=4000
 
 EXPOSE 4000
 
-# Optionally, add a script to run migrations & start server
-# e.g.: CMD ["npm", "start"]
-CMD ["node", "src/server.js"]
+CMD ["sh", "-c", "node migrate.js && node src/server.js"]

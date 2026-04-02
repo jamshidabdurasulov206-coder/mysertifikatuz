@@ -218,7 +218,7 @@ exports.saveReview = async (req, res) => {
       [JSON.stringify(mergedScores), attemptId]
     );
 
-    res.json({ message: "Tekshiruv saqlandi", attempt: updated.rows[0] });
+    res.json({ message: "Foydalanuvchi tasdiqlandi", attempt: updated.rows[0] });
   } catch (err) {
     res.status(500).json({ message: 'Server error', error: err.message });
   }

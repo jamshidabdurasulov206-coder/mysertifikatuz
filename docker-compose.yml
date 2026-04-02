@@ -1,4 +1,4 @@
-version: '3.8'
+version: "3.9"
 
 services:
   db:
@@ -9,10 +9,23 @@ services:
       POSTGRES_USER: ${DB_USER:-test_app}
       POSTGRES_PASSWORD: ${DB_PASSWORD:-1234}
       POSTGRES_DB: ${DB_NAME:-test_app}
-    ports:
-      - "5432:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-test_app} -d ${DB_NAME:-test_app}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - m-network
+
+  redis:
+    image: redis:7-alpine
+    container_name: milliysertifikat-redis
+    restart: always
+    command: ["redis-server", "--save", "60", "1", "--loglevel", "warning"]
+    volumes:
+      - redisdata:/data
     networks:
       - m-network
 
@@ -24,6 +37,8 @@ services:
     restart: always
     ports:
       - "4000:4000"
+    env_file:
+      - .env
     environment:
       - PORT=4000
       - NODE_ENV=production
@@ -32,17 +47,33 @@ services:
       - DB_NAME=${DB_NAME:-test_app}
       - DB_HOST=db
       - DB_PORT=5432
+      - ENABLE_REDIS_QUEUE=${ENABLE_REDIS_QUEUE:-true}
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
       - JWT_SECRET=${JWT_SECRET}
       - PAYME_MERCHANT_ID=${PAYME_MERCHANT_ID}
       - PAYME_SECRET_KEY=${PAYME_SECRET_KEY}
       - GEMINI_API_KEY=${GEMINI_API_KEY}
+      - GEMINI_MODEL=${GEMINI_MODEL:-gemini-3.1-flash-lite-preview}
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
+      - CORS_ORIGIN=${CORS_ORIGIN:-*}
+      - ADMIN_EMAIL=${ADMIN_EMAIL:-admin@example.com}
+      - ADMIN_PASSWORD=${ADMIN_PASSWORD:-admin123}
+      - REQUIRE_MANUAL_PAYMENT=${REQUIRE_MANUAL_PAYMENT:-true}
     depends_on:
-      - db
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    volumes:
+      - uploads:/app/server/uploads
     networks:
       - m-network
 
 volumes:
   pgdata:
+  redisdata:
+  uploads:
 
 networks:
   m-network:

@@ -1,0 +1,16 @@
+node_modules
+**/node_modules
+**/.git
+.git
+.gitignore
+frontend/build
+server/logs
+server/uploads/receipts
+*.log
+.env
+server/.env
+frontend/.env
+coverage
+**/coverage
+.vscode
+.idea

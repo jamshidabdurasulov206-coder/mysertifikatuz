@@ -10,8 +10,10 @@ const AdminReviewPage = () => {
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState("");
+  const [messageType, setMessageType] = useState("info");
   const [showOnlyDiff, setShowOnlyDiff] = useState(false);
   const [showOnlyOpenEnded, setShowOnlyOpenEnded] = useState(false);
+  const [approvedAttemptIds, setApprovedAttemptIds] = useState({});
 
   const OPEN_TYPES = new Set(["writing", "open", "open_ended", "open-ended", "open ended", "openended"]);
 
@@ -46,6 +48,7 @@ const AdminReviewPage = () => {
   const fetchAttempts = useCallback(async () => {
     setLoading(true);
     setMessage("");
+    setMessageType("info");
 
     const token = localStorage.getItem("token");
     if (!token) {
@@ -53,6 +56,7 @@ const AdminReviewPage = () => {
       setSelected(null);
       setScores({});
       setMessage("Admin token topilmadi. Iltimos, qaytadan login qiling.");
+      setMessageType("error");
       setLoading(false);
       return;
     }
@@ -73,8 +77,10 @@ const AdminReviewPage = () => {
       const apiMessage = e?.response?.data?.message;
       if (status === 401 || status === 403) {
         setMessage("Ruxsat yo'q yoki sessiya tugagan. Admin sifatida qayta login qiling.");
+        setMessageType("error");
       } else {
         setMessage(apiMessage || "Xatolik: tekshiruv ma'lumotlarini yuklab bo'lmadi");
+        setMessageType("error");
       }
     }
     setLoading(false);
@@ -102,25 +108,21 @@ const AdminReviewPage = () => {
     if (!selected) return;
     setSaving(true);
     setMessage("");
+    setMessageType("info");
     try {
       await axios.patch(`/attempts/${selected.id}/save-review`, {
         written_scores: scores
       });
-      setMessage("Tekshiruv saqlandi");
+      setMessage("Foydalanuvchi tasdiqlandi");
+      setMessageType("success");
       await fetchAttempts();
 
-      const updatedQuestions = (selected.questions || []).map(q => {
-        const finalScore = normalizeBinary(scores[q.id]);
-        const autoScore = normalizeBinary(q.auto_score);
-        return {
-          ...q,
-          current_score: finalScore,
-          is_overridden: finalScore !== autoScore
-        };
-      });
-      setSelected({ ...selected, questions: updatedQuestions, status: 'reviewed' });
+      setApprovedAttemptIds((prev) => ({ ...prev, [selected.id]: true }));
+      setSelected(null);
+      setScores({});
     } catch (e) {
       setMessage("Xatolik: saqlanmadi");
+      setMessageType("error");
     }
     setSaving(false);
   };
@@ -139,6 +141,13 @@ const AdminReviewPage = () => {
     adminChanged: visibleQuestions.filter((q) => normalizeBinary(scores[q.id]) !== normalizeBinary(q.auto_score)).length
   };
 
+  const messageClass =
+    messageType === "success"
+      ? "bg-green-50 text-green-700"
+      : messageType === "error"
+      ? "bg-red-50 text-red-700"
+      : "bg-blue-50 text-blue-700";
+
   return (
     <div className="p-8 bg-slate-50 min-h-screen">
       <div className="flex items-center justify-between mb-4">
@@ -152,7 +161,7 @@ const AdminReviewPage = () => {
       </div>
 
       {message && (
-        <div className="mb-4 bg-blue-50 text-blue-700 px-4 py-2 rounded">{message}</div>
+        <div className={`mb-4 px-4 py-2 rounded ${messageClass}`}>{message}</div>
       )}
 
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
@@ -179,7 +188,12 @@ const AdminReviewPage = () => {
                 <tr key={a.id} className={selected && selected.id === a.id ? "bg-blue-50" : ""}>
                   <td className="border px-2 py-1">{i + 1}</td>
                   <td className="border px-2 py-1">
-                    <button className="text-blue-700 underline" onClick={() => handleSelect(a)}>{a.user_name || "-"}</button>
+                    <div className="flex items-center gap-2">
+                      <button className="text-blue-700 underline" onClick={() => handleSelect(a)}>{a.user_name || "-"}</button>
+                      {approvedAttemptIds[a.id] && (
+                        <span className="text-xs px-2 py-0.5 rounded bg-green-100 text-green-700">Tasdiqlandi</span>
+                      )}
+                    </div>
                   </td>
                   <td className="border px-2 py-1">{a.test_name || "-"}</td>
                   <td className="border px-2 py-1">{a.subject_name || "-"}</td>
