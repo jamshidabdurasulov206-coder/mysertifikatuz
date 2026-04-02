@@ -132,7 +132,8 @@ const PaymentPage = () => {
               <h3 style={{ fontSize: "18px", fontWeight: 800, marginBottom: "24px" }}>To'lov ma'lumoti</h3>
               <div style={{ background: "rgba(37,99,235,0.05)", padding: "16px", borderRadius: "16px", border: "1px dashed var(--bba-primary)" }}>
                 <p style={{ fontWeight: 800, fontSize: "14px", marginBottom: 8 }}>Admin karta raqami:</p>
-                <p style={{ fontSize: "22px", fontWeight: 900, letterSpacing: "1px" }}>8600 1234 5678 9999</p>
+                <p style={{ fontSize: "22px", fontWeight: 900, letterSpacing: "1px" }}>9860 3501 4000 3541</p>
+                <p style={{ fontSize: "14px", fontWeight: 700, marginTop: 6 }}>Abdurasulov Jamshid</p>
                 <p style={{ fontSize: "13px", color: "var(--bba-text-muted)", marginTop: 6 }}>To'lovni shu kartaga qiling va chekningiz linkini yuboring.</p>
               </div>
 
