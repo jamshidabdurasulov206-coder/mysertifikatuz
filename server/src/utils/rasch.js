@@ -41,14 +41,12 @@ function calculateTScore(zScore) {
  */
 function calculateStandardBall(tScore, subjectName) {
   const maxBall = 100;
-
-  // 65 va undan yuqori (A/A+) bo'lsa maksimal ball beriladi
-  if (tScore >= 65) return maxBall;
   
   // 46 dan past bo'lsa sertifikat berilmaydi (0 ball)
   if (tScore < 46) return 0;
 
-  // 46-65 oralig'ida proporsional hisoblanadi: Yakuniy ball = (T / 65) * maxBall
+  // 46 dan yuqorida Rasch T-score proporsional konvert qilinadi.
+  // Yuqori cap qo'yilmaydi: T-score oshsa, standard_ball ham oshadi.
   return Math.round((tScore / 65) * maxBall);
 }
 
@@ -62,7 +60,7 @@ function calculatePercentage(subjectName, standardBall, tScore) {
   const maxBall = getMaxBall(subjectName);
   const safeBall = Number(standardBall) || 0;
   if (maxBall === 0) return 0;
-  return Math.round((safeBall / maxBall) * 100);
+  return Math.max(0, Math.min(100, Math.round((safeBall / maxBall) * 100)));
 }
 
 /**

@@ -1,10 +1,10 @@
 const { calculateStandardBall, convertWritingScore, calculateLevel } = require('./rasch');
 
 describe('Rasch utils', () => {
-  test('calculateStandardBall returns 100 when tScore >= 65', () => {
-    expect(calculateStandardBall(70, 'Matematika (Mutaxassislik 1)')).toBe(100);
+  test('calculateStandardBall scales above 100 when tScore > 65', () => {
+    expect(calculateStandardBall(70, 'Matematika (Mutaxassislik 1)')).toBe(108);
     expect(calculateStandardBall(65, 'Fizika (2-fan)')).toBe(100);
-    expect(calculateStandardBall(65, 'Tarix')).toBe(100);
+    expect(calculateStandardBall(80, 'Tarix')).toBe(123);
   });
 
   test('calculateStandardBall returns 0 for failing tScore', () => {

@@ -8,6 +8,11 @@ const connection = process.env.REDIS_URL
   ? { url: process.env.REDIS_URL }
   : { host: process.env.REDIS_HOST || "127.0.0.1", port: Number(process.env.REDIS_PORT) || 6379 };
 
+const parsedConcurrency = Number(process.env.ATTEMPT_WORKER_CONCURRENCY || 5);
+const workerConcurrency = Number.isFinite(parsedConcurrency) && parsedConcurrency > 0
+  ? Math.floor(parsedConcurrency)
+  : 5;
+
 const queueName = "attempt-evaluation";
 
 let attemptQueue;
@@ -96,7 +101,7 @@ function startAttemptWorker() {
         await evaluateAttemptByAI(attemptId);
         return { attemptId };
       },
-      { connection }
+      { connection, concurrency: workerConcurrency }
     );
 
     worker.on("completed", (job) => {
@@ -113,7 +118,7 @@ function startAttemptWorker() {
       try { worker.close(); } catch (e) { /* ignore */ }
     });
 
-    logger.info("[AttemptQueue] Worker ishga tushdi");
+    logger.info("[AttemptQueue] Worker ishga tushdi", { concurrency: workerConcurrency });
 
     return worker;
   } catch (err) {
