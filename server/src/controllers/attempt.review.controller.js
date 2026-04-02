@@ -1,5 +1,24 @@
 const attemptModel = require("../models/attempt.model");
 const { calculateAllRaschStats } = require('../utils/rasch');
+const { evaluateAnswer } = require("../utils/evaluator");
+const pool = require("../config/db");
+
+const OPEN_TYPES = new Set(["writing", "open", "open_ended", "open-ended", "open ended", "openended", "openEnded", "OPEN_ENDED"]);
+
+function parseJSON(value) {
+  if (value === null || value === undefined) return {};
+  if (typeof value === 'object') return value;
+  if (typeof value === 'string' && value.trim().length > 0) {
+    try { return JSON.parse(value); } catch (e) { return {}; }
+  }
+  return {};
+}
+
+function normalizeBinary(value) {
+  const num = Number(value);
+  if (!isFinite(num)) return null;
+  return num >= 0.5 ? 1 : 0;
+}
 
 exports.getThetaStats = async (req, res) => {
   try {
@@ -50,6 +69,106 @@ exports.getPendingAttempts = async (req, res) => {
   }
 };
 
+exports.getPreRaschReviewAttempts = async (req, res) => {
+  try {
+    const attemptsRes = await pool.query(
+      `SELECT a.*, u.username as user_name, u.email as user_email, t.title as test_name
+       FROM attempts a
+       JOIN users u ON a.user_id = u.id
+       JOIN tests t ON a.test_id = t.id
+       WHERE a.is_published = false AND a.status IN ('ready_for_rasch', 'reviewed')
+       ORDER BY a.created_at DESC`
+    );
+
+    const attempts = attemptsRes.rows;
+    if (attempts.length === 0) return res.json([]);
+
+    const testIds = [...new Set(attempts.map(a => a.test_id))];
+    const questionsByTest = new Map();
+
+    for (const testId of testIds) {
+      const qRes = await pool.query(
+        `SELECT id, question_text, type, options, correct_option, correct_answer_text
+         FROM questions
+         WHERE test_id = $1
+         ORDER BY id`,
+        [testId]
+      );
+      questionsByTest.set(testId, qRes.rows);
+    }
+
+    const mapped = attempts.map((attempt) => {
+      const answersObj = parseJSON(attempt.answers);
+      const writtenScoresObj = parseJSON(attempt.written_scores);
+      const questions = questionsByTest.get(attempt.test_id) || [];
+
+      const questionsWithScores = questions.map((q) => {
+        const isOpen = OPEN_TYPES.has((q.type || '').toLowerCase()) || q.type === 'OPEN_ENDED';
+        const userAnswer = answersObj[q.id] ?? "";
+
+        let autoScore = 0;
+        let aiCheckType = "key";
+        let aiCheckDetail = "";
+        if (isOpen) {
+          aiCheckType = "ai";
+          const aiRaw = evaluateAnswer(String(userAnswer || ""), String(q.correct_answer_text || ""));
+          autoScore = aiRaw >= 0.5 ? 1 : 0;
+          aiCheckDetail = `AI mazmuniy tekshiruv (raw=${Number(aiRaw).toFixed(2)})`; 
+        } else {
+          const hasAnswer = userAnswer !== undefined && userAnswer !== null && String(userAnswer).length > 0;
+          if (hasAnswer && q.correct_option !== null && q.correct_option !== undefined) {
+            autoScore = String(userAnswer).trim() === String(q.correct_option).trim() ? 1 : 0;
+          }
+          aiCheckDetail = "Kalit bo'yicha avtomatik tekshiruv";
+        }
+
+        const currentScore = normalizeBinary(writtenScoresObj[q.id]);
+        const finalScore = currentScore === null ? autoScore : currentScore;
+        const isOverridden = finalScore !== autoScore;
+
+        let parsedOptions = [];
+        try {
+          parsedOptions = typeof q.options === 'string' ? JSON.parse(q.options) : (Array.isArray(q.options) ? q.options : []);
+        } catch (e) {
+          parsedOptions = [];
+        }
+
+        return {
+          id: q.id,
+          question_text: q.question_text,
+          type: q.type,
+          options: parsedOptions,
+          correct_option: q.correct_option,
+          correct_answer_text: q.correct_answer_text,
+          user_answer: userAnswer,
+          ai_check_type: aiCheckType,
+          ai_check_detail: aiCheckDetail,
+          auto_score: autoScore,
+          current_score: finalScore,
+          is_overridden: isOverridden
+        };
+      });
+
+      return {
+        id: attempt.id,
+        user_id: attempt.user_id,
+        user_name: attempt.user_name,
+        user_email: attempt.user_email,
+        test_id: attempt.test_id,
+        test_name: attempt.test_name,
+        subject_name: attempt.subject_name,
+        status: attempt.status,
+        created_at: attempt.created_at,
+        questions: questionsWithScores
+      };
+    });
+
+    res.json(mapped);
+  } catch (err) {
+    res.status(500).json({ message: 'Server error', error: err.message });
+  }
+};
+
 exports.reviewAttemptById = async (req, res) => {
   try {
     const attemptId = req.params.id;
@@ -66,41 +185,40 @@ exports.saveReview = async (req, res) => {
   try {
     const attemptId = req.params.id;
     const { written_scores } = req.body;
-
     const attempt = await attemptModel.getAttemptById(attemptId);
     if (!attempt) return res.status(404).json({ message: "Attempt not found" });
 
-    const questions = await attemptModel.getQuestionsByTestId(attempt.test_id);
+    const mergedScores = {
+      ...parseJSON(attempt.written_scores),
+      ...parseJSON(written_scores)
+    };
 
-    let totalCredit = 0;
-    let openCount = 0;
-    for (const q of questions) {
-      if (q.type === 'writing' || q.type === 'open' || q.type === 'OPEN_ENDED') {
-        openCount += 1;
-        const val = written_scores[q.id];
-        const num = Number(val);
-        if (isFinite(num)) {
-          if (num >= 1) totalCredit += 1;
-          else if (num >= 0.5) totalCredit += 0.5;
-        }
+    Object.keys(mergedScores).forEach((key) => {
+      const normalized = normalizeBinary(mergedScores[key]);
+      if (normalized === null) {
+        delete mergedScores[key];
+      } else {
+        mergedScores[key] = normalized;
       }
-    }
-    const wrong = Math.max(0, openCount - totalCredit);
-    const theta = Math.log((totalCredit + 0.5) / (wrong + 0.5));
-
-    let finalScore = attempt.final_score;
-    if (typeof finalScore !== 'number' || isNaN(finalScore)) finalScore = 0;
-    
-    // We pass null for pool in calculateAllRaschStats because it uses attemptModel instead inside the util if we updated it, but the util uses a passed pool. Wait, rasch.js might need the pool. Let's pass pool.
-    const pool = require("../config/db");
-    const stats = await calculateAllRaschStats(pool, theta, finalScore, attempt.subject_name);
-
-    const updatedAttempt = await attemptModel.updateAttemptReviewWithStats(attemptId, written_scores, theta, stats);
-
-    res.json({
-      message: "Baholash saqlandi", attempt: updatedAttempt,
-      theta, ...stats
     });
+
+    const updated = await pool.query(
+      `UPDATE attempts
+       SET written_scores = $1,
+           is_reviewed = true,
+           is_published = false,
+           status = 'reviewed',
+           final_theta_score = NULL,
+           z_score = NULL,
+           t_score = NULL,
+           standard_ball = NULL,
+           level = 'PENDING'
+       WHERE id = $2
+       RETURNING *`,
+      [JSON.stringify(mergedScores), attemptId]
+    );
+
+    res.json({ message: "Tekshiruv saqlandi", attempt: updated.rows[0] });
   } catch (err) {
     res.status(500).json({ message: 'Server error', error: err.message });
   }

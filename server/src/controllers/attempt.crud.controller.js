@@ -81,7 +81,11 @@ exports.createAttempt = async (req, res) => {
 
 exports.getAttemptsByTest = async (req, res) => {
   try {
-    const attempts = await attemptService.getAttemptsByTest(req.params.testId);
+    const testId = Number(req.params.testId);
+    if (!Number.isInteger(testId) || testId <= 0) {
+      return res.status(400).json({ message: "Noto'g'ri test ID" });
+    }
+    const attempts = await attemptService.getAttemptsByTest(testId);
     res.json(attempts.map(withPercentage));
   } catch (err) {
     res.status(500).json({ message: err.message });

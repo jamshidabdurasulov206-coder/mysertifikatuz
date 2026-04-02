@@ -67,6 +67,12 @@ exports.publishBatch = async (testId, { publish = true } = {}) => {
       for (const q of questions) {
         const isOpen = OPEN_TYPES.has((q.type || '').toLowerCase()) || q.type === 'OPEN_ENDED';
         let credit = 0;
+        const override = writtenScores[q.id];
+        if (override !== undefined && override !== null && String(override).trim() !== '') {
+          credit = normalizeOpenCredit(override);
+          perQuestionCorrect.set(q.id, perQuestionCorrect.get(q.id) + credit);
+          continue;
+        }
         if (isOpen) {
           const val = writtenScores[q.id];
           credit = normalizeOpenCredit(val);
@@ -101,6 +107,13 @@ exports.publishBatch = async (testId, { publish = true } = {}) => {
       for (const q of questions) {
         const isOpen = OPEN_TYPES.has((q.type || '').toLowerCase()) || q.type === 'OPEN_ENDED';
         let credit = 0;
+        const override = writtenScores[q.id];
+        if (override !== undefined && override !== null && String(override).trim() !== '') {
+          credit = normalizeOpenCredit(override);
+          weightedCorrectCount += credit;
+          if (credit >= 0.5) binaryCorrectCount += 1;
+          continue;
+        }
         if (isOpen) {
           const val = writtenScores[q.id];
           credit = normalizeOpenCredit(val);

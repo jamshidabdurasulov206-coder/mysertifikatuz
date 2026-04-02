@@ -28,6 +28,8 @@ router.post('/rasch-run', auth, isAdmin, publishController.computeRaschAll);
 // Tekshirilmagan yozma javoblar ro'yxati
 router.get('/unreviewed', auth, isAdmin, reviewController.getUnreviewedAttempts);
 router.get('/pending', auth, isAdmin, reviewController.getPendingAttempts);
+router.get('/admin/pre-rasch-review', auth, isAdmin, reviewController.getPreRaschReviewAttempts);
+router.get('/pre-rasch-review', auth, isAdmin, reviewController.getPreRaschReviewAttempts);
 
 // Admin tomonidan ball qo'yish va natijani e'lon qilish
 router.post('/review', auth, isAdmin, reviewController.reviewAttempt);
