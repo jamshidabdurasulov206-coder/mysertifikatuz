@@ -16,12 +16,19 @@ const getGoogleDriveDirectLink = (url) => {
 export default function ExamPage() {
   const navigate = useNavigate();
   const toast = useToast();
+  const [isMobile, setIsMobile] = useState(() => window.innerWidth <= 768);
   const [questions, setQuestions] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [answers, setAnswers] = useState({});
   const [currentSubject, setCurrentSubject] = useState(null);
   const [loading, setLoading] = useState(true);
   const [showConfirm, setShowConfirm] = useState(false);
+
+  useEffect(() => {
+    const onResize = () => setIsMobile(window.innerWidth <= 768);
+    window.addEventListener("resize", onResize);
+    return () => window.removeEventListener("resize", onResize);
+  }, []);
 
   const isAnsweredValue = (value) => {
     if (value === undefined || value === null) return false;
@@ -130,7 +137,7 @@ export default function ExamPage() {
   const isCritical = timeLeft < 180;
 
   return (
-    <div style={{ minHeight: "100vh", background: "var(--bba-bg)", paddingBottom: "120px" }}>
+    <div style={{ minHeight: "100vh", background: "var(--bba-bg)", paddingBottom: isMobile ? "108px" : "120px" }}>
       {/* Progress Bar Top */}
       <div style={{ position: "fixed", top: 0, left: 0, right: 0, height: "6px", background: "rgba(0,0,0,0.05)", zIndex: 1000 }}>
         <div style={{ width: `${progressPct}%`, height: "100%", background: isCritical ? "var(--bba-danger)" : "var(--bba-primary)", transition: "width 0.4s ease" }} />
@@ -140,39 +147,39 @@ export default function ExamPage() {
       <header style={{ 
         position: "sticky", top: "6px", zIndex: 900, 
         background: "rgba(255,255,255,0.7)", backdropFilter: "blur(20px)",
-        borderBottom: "1px solid var(--bba-border)", padding: "20px"
+        borderBottom: "1px solid var(--bba-border)", padding: isMobile ? "12px" : "20px"
       }}>
-        <div className="bba-container" style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+        <div className="bba-container" style={{ display: "flex", justifyContent: "space-between", alignItems: isMobile ? "flex-start" : "center", gap: isMobile ? "10px" : "0", flexDirection: isMobile ? "column" : "row" }}>
            <div>
-              <h1 style={{ fontSize: "18px", fontWeight: 900, margin: 0, color: "#1e40af" }}>{currentSubject?.name}</h1>
+            <h1 style={{ fontSize: isMobile ? "16px" : "18px", fontWeight: 900, margin: 0, color: "#1e40af" }}>{currentSubject?.name}</h1>
               <p style={{ fontSize: "11px", fontWeight: 800, color: "var(--bba-text-muted)", textTransform: "uppercase" }}>Milliy Sertifikat Imtihoni</p>
            </div>
-           <div style={{ display: "flex", alignItems: "center", gap: "24px" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: isMobile ? "12px" : "24px", width: isMobile ? "100%" : "auto", justifyContent: isMobile ? "space-between" : "flex-start" }}>
               <div style={{ textAlign: "right" }}>
                  <p style={{ fontSize: "10px", fontWeight: 800, color: "var(--bba-text-muted)", margin: 0 }}>QOLGAN VAQT</p>
-                 <span style={{ fontSize: "24px", fontWeight: 900, color: isCritical ? "var(--bba-danger)" : "var(--bba-text-main)", fontVariantNumeric: "tabular-nums" }}>
+              <span style={{ fontSize: isMobile ? "20px" : "24px", fontWeight: 900, color: isCritical ? "var(--bba-danger)" : "var(--bba-text-main)", fontVariantNumeric: "tabular-nums" }}>
                     {Math.floor(timeLeft / 60)}:{(timeLeft % 60).toString().padStart(2, '0')}
                  </span>
               </div>
               <button 
                 onClick={() => setShowConfirm(true)}
                 className="bba-button bba-button-primary"
-                style={{ background: "var(--bba-danger)", boxShadow: "0 10px 20px -5px rgba(244,63,94,0.4)" }}
+             style={{ background: "var(--bba-danger)", boxShadow: "0 10px 20px -5px rgba(244,63,94,0.4)", padding: isMobile ? "10px 14px" : undefined }}
               >Yakunlash</button>
            </div>
         </div>
       </header>
 
-      <main className="bba-container" style={{ marginTop: "40px", maxWidth: "900px" }}>
+      <main className="bba-container" style={{ marginTop: isMobile ? "18px" : "40px", maxWidth: "900px", padding: isMobile ? "0 10px" : undefined }}>
         {/* Question Card */}
-        <div className="bba-glass-card" style={{ padding: "48px", animation: "fadeInUp 0.4s ease" }}>
+        <div className="bba-glass-card" style={{ padding: isMobile ? "18px" : "48px", animation: "fadeInUp 0.4s ease" }}>
           <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "32px" }}>
              <span style={{ padding: "6px 16px", borderRadius: "10px", background: "rgba(37,99,235,0.1)", color: "var(--bba-primary)", fontWeight: 800, fontSize: "13px" }}>
                 Savol {currentIndex + 1} / {questions.length}
              </span>
           </div>
 
-          <h2 style={{ fontSize: "28px", fontWeight: 800, lineHeight: 1.4, marginBottom: "32px", color: "var(--bba-text-main)" }}>
+         <h2 style={{ fontSize: isMobile ? "20px" : "28px", fontWeight: 800, lineHeight: 1.4, marginBottom: "32px", color: "var(--bba-text-main)" }}>
             {currentQuestion?.question_text}
           </h2>
 
@@ -201,7 +208,7 @@ export default function ExamPage() {
                   }}>
                     {String.fromCharCode(65 + i)}
                   </div>
-                  <span style={{ fontSize: "18px", fontWeight: 600 }}>{opt}</span>
+                  <span style={{ fontSize: isMobile ? "16px" : "18px", fontWeight: 600 }}>{opt}</span>
                 </label>
               ))
             ) : (
@@ -210,7 +217,7 @@ export default function ExamPage() {
                   value={answers[currentQuestion.id] || ""}
                   onChange={(e) => handleAnswerChange(currentQuestion.id, e.target.value)}
                   placeholder="Javobingizni shu yerga yozing..."
-                style={{ width: "100%", height: "160px", padding: "20px", borderRadius: "20px", border: "2px solid var(--bba-border)", fontSize: "18px", fontFamily: "inherit", outline: "none", background: "#ffffff", color: "#111827", caretColor: "#111827" }}
+                style={{ width: "100%", height: "160px", padding: "20px", borderRadius: "20px", border: "2px solid var(--bba-border)", fontSize: isMobile ? "16px" : "18px", fontFamily: "inherit", outline: "none", background: "#ffffff", color: "#111827", caretColor: "#111827" }}
                />
             )}
           </div>
@@ -238,7 +245,7 @@ export default function ExamPage() {
 
       {/* Footer Navigation */}
       <footer style={{ 
-        position: "fixed", bottom: "32px", left: "50%", transform: "translateX(-50%)",
+        position: "fixed", bottom: isMobile ? "14px" : "32px", left: "50%", transform: "translateX(-50%)",
         width: "90%", maxWidth: "600px", padding: "16px", borderRadius: "24px",
         background: "rgba(255,255,255,0.8)", backdropFilter: "blur(20px)",
         border: "1px solid var(--bba-border)", boxShadow: "var(--bba-shadow-premium)",
@@ -247,11 +254,11 @@ export default function ExamPage() {
          <button 
            disabled={currentIndex === 0}
            onClick={() => setCurrentIndex(c => c - 1)}
-           className="bba-button" style={{ padding: "16px 32px" }}>← OLDINGI</button>
+           className="bba-button" style={{ padding: isMobile ? "12px 14px" : "16px 32px", fontSize: isMobile ? "12px" : undefined }}>← OLDINGI</button>
          <button 
            disabled={currentIndex === questions.length - 1}
            onClick={() => setCurrentIndex(c => c + 1)}
-           className="bba-button bba-button-primary" style={{ padding: "16px 32px" }}>KEYINGI →</button>
+           className="bba-button bba-button-primary" style={{ padding: isMobile ? "12px 14px" : "16px 32px", fontSize: isMobile ? "12px" : undefined }}>KEYINGI →</button>
       </footer>
 
       {/* Confirm Modal */}

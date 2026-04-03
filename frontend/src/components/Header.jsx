@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
@@ -9,6 +9,13 @@ export default function Header() {
   const location = useLocation();
   const { user, logout } = useAuth();
   const { dark } = useTheme();
+  const [isMobile, setIsMobile] = useState(() => window.innerWidth <= 768);
+
+  useEffect(() => {
+    const onResize = () => setIsMobile(window.innerWidth <= 768);
+    window.addEventListener('resize', onResize);
+    return () => window.removeEventListener('resize', onResize);
+  }, []);
 
   const handleLogout = () => {
     logout();
@@ -29,7 +36,9 @@ export default function Header() {
       transition: 'all 0.3s ease'
     }}>
       <div className="bba-container" style={{
-        height: '80px',
+        minHeight: isMobile ? '64px' : '80px',
+        paddingTop: isMobile ? '10px' : '0',
+        paddingBottom: isMobile ? '10px' : '0',
         display: 'flex',
         justifyContent: 'space-between',
         alignItems: 'center'
@@ -48,8 +57,8 @@ export default function Header() {
           onMouseOut={e => e.currentTarget.style.transform = 'scale(1)'}
         >
           <div style={{
-            width: '44px',
-            height: '44px',
+            width: isMobile ? '36px' : '44px',
+            height: isMobile ? '36px' : '44px',
             background: 'linear-gradient(135deg, #2563eb, #6366f1)',
             borderRadius: '14px',
             display: 'flex',
@@ -57,11 +66,11 @@ export default function Header() {
             justifyContent: 'center',
             boxShadow: '0 8px 16px -4px rgba(37, 99, 235, 0.4)'
           }}>
-            <span style={{ color: '#fff', fontWeight: 900, fontSize: '20px' }}>B</span>
+            <span style={{ color: '#fff', fontWeight: 900, fontSize: isMobile ? '16px' : '20px' }}>B</span>
           </div>
           <div>
             <h1 style={{ 
-              fontSize: '18px', 
+              fontSize: isMobile ? '15px' : '18px', 
               fontWeight: 900, 
               margin: 0, 
               letterSpacing: '-0.5px',
@@ -79,6 +88,7 @@ export default function Header() {
         </div>
 
         {/* Navigation Links */}
+        {!isMobile && (
         <nav style={{ display: 'flex', alignItems: 'center', gap: '32px' }}>
           {[
             { name: 'Testlar', path: '/tests' },
@@ -133,18 +143,19 @@ export default function Header() {
             </button>
           )}
         </nav>
+        )}
 
         {/* Right Section */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: isMobile ? '8px' : '16px' }}>
           <button
             onClick={() => navigate(-1)}
             style={{
               border: `1px solid ${dark ? '#334155' : '#e2e8f0'}`,
               background: dark ? '#1e293b' : '#ffffff',
               color: dark ? '#f1f5f9' : '#0f172a',
-              padding: '10px 14px',
+              padding: isMobile ? '8px 10px' : '10px 14px',
               borderRadius: '12px',
-              fontSize: '13px',
+              fontSize: isMobile ? '12px' : '13px',
               fontWeight: 800,
               cursor: 'pointer',
               display: 'inline-flex',
@@ -154,12 +165,12 @@ export default function Header() {
             }}
           >
             <span style={{ fontWeight: 900 }}>&lt;</span>
-            Ortga
+            {!isMobile ? 'Ortga' : ''}
           </button>
 
           <DarkModeToggle />
           
-          <div style={{ height: '24px', width: '1px', background: dark ? '#334155' : '#e2e8f0' }} />
+          {!isMobile && <div style={{ height: '24px', width: '1px', background: dark ? '#334155' : '#e2e8f0' }} />}
           
           <button
             onClick={handleLogout}
@@ -167,9 +178,9 @@ export default function Header() {
               background: 'transparent',
               border: `1px solid ${dark ? '#334155' : '#e2e8f0'}`,
               color: dark ? '#f1f5f9' : '#0f172a',
-              padding: '8px 16px',
+              padding: isMobile ? '8px 10px' : '8px 16px',
               borderRadius: '12px',
-              fontSize: '13px',
+              fontSize: isMobile ? '12px' : '13px',
               fontWeight: 700,
               cursor: 'pointer',
               transition: 'all 0.2s ease'
@@ -185,7 +196,7 @@ export default function Header() {
               e.currentTarget.style.borderColor = dark ? '#334155' : '#e2e8f0';
             }}
           >
-            Chiqish
+            {isMobile ? 'Exit' : 'Chiqish'}
           </button>
         </div>
       </div>

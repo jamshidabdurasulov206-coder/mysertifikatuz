@@ -10,7 +10,14 @@ export default function TestsPage() {
   const [search, setSearch] = useState("");
   const [selectedSubject, setSelectedSubject] = useState("all");
   const [sortBy, setSortBy] = useState("newest");
+  const [isMobile, setIsMobile] = useState(() => window.innerWidth <= 768);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const onResize = () => setIsMobile(window.innerWidth <= 768);
+    window.addEventListener("resize", onResize);
+    return () => window.removeEventListener("resize", onResize);
+  }, []);
 
   useEffect(() => {
     Promise.all([getTests(), getSubjects()])
@@ -46,31 +53,33 @@ export default function TestsPage() {
     <div style={{ minHeight: "100vh", background: "var(--bba-bg)" }}>
       <Header />
       
-      <main className="bba-container" style={{ padding: "40px 24px" }}>
+      <main className="bba-container" style={{ padding: isMobile ? "24px 12px" : "40px 24px" }}>
         {/* Banner Section */}
         <section style={{
           background: "linear-gradient(135deg, #2563eb, #6366f1)",
           borderRadius: "var(--bba-radius-xl)",
-          padding: "48px 40px",
-          marginBottom: "40px",
+          padding: isMobile ? "24px 18px" : "48px 40px",
+          marginBottom: isMobile ? "24px" : "40px",
           color: "#fff",
           display: "flex",
           justifyContent: "space-between",
-          alignItems: "center",
+          alignItems: isMobile ? "flex-start" : "center",
+          flexDirection: isMobile ? "column" : "row",
+          gap: isMobile ? "12px" : "0",
           boxShadow: "0 20px 40px -10px rgba(37, 99, 235, 0.4)",
           position: "relative",
           overflow: "hidden"
         }}>
           <div style={{ position: "absolute", top: "-20%", right: "-10%", width: "400px", height: "400px", background: "rgba(255,255,255,0.05)", borderRadius: "50%" }}></div>
           <div style={{ position: "relative", zIndex: 1 }}>
-            <h2 style={{ fontSize: "32px", fontWeight: 900, marginBottom: "12px", color: "white" }}>
+            <h2 style={{ fontSize: isMobile ? "24px" : "32px", fontWeight: 900, marginBottom: "12px", color: "white" }}>
               Bilimlariningni sinovdan o'tkaz 🚀
             </h2>
-            <p style={{ fontSize: "16px", fontWeight: 500, opacity: 0.9 }}>
+            <p style={{ fontSize: isMobile ? "14px" : "16px", fontWeight: 500, opacity: 0.9 }}>
               BBA platformasida mavjud testlarni tanlang va o'z darajangizni aniqlang.
             </p>
           </div>
-          <div style={{ fontSize: "64px", filter: "drop-shadow(0 10px 20px rgba(0,0,0,0.2))" }}>📚</div>
+          <div style={{ fontSize: isMobile ? "42px" : "64px", filter: "drop-shadow(0 10px 20px rgba(0,0,0,0.2))" }}>📚</div>
         </section>
 
         {/* Filters and Search */}
@@ -109,7 +118,7 @@ export default function TestsPage() {
             value={selectedSubject}
             onChange={(e) => setSelectedSubject(e.target.value)}
             style={{
-              padding: "14px 20px",
+              padding: isMobile ? "12px 14px" : "14px 20px",
               borderRadius: "var(--bba-radius-lg)",
               border: `1px solid var(--bba-border)`,
               background: "var(--bba-card)",
@@ -130,7 +139,7 @@ export default function TestsPage() {
             value={sortBy}
             onChange={(e) => setSortBy(e.target.value)}
             style={{
-              padding: "14px 20px",
+              padding: isMobile ? "12px 14px" : "14px 20px",
               borderRadius: "var(--bba-radius-lg)",
               border: `1px solid var(--bba-border)`,
               background: "var(--bba-card)",
@@ -161,8 +170,8 @@ export default function TestsPage() {
         ) : (
           <div style={{
             display: "grid",
-            gridTemplateColumns: "repeat(auto-fill, minmax(320px, 1fr))",
-            gap: "24px"
+            gridTemplateColumns: isMobile ? "1fr" : "repeat(auto-fill, minmax(320px, 1fr))",
+            gap: isMobile ? "14px" : "24px"
           }}>
             {filtered.map(test => {
               const subject = subjects.find(s => String(s.id) === String(test.subject_id));
@@ -171,7 +180,7 @@ export default function TestsPage() {
                   key={test.id}
                   className="bba-glass-card"
                   style={{
-                    padding: "24px",
+                    padding: isMobile ? "16px" : "24px",
                     display: "flex",
                     flexDirection: "column",
                     gap: "16px",
@@ -199,7 +208,7 @@ export default function TestsPage() {
                   </div>
 
                   <div style={{ flex: 1 }}>
-                    <h3 style={{ fontSize: "20px", fontWeight: 800, margin: "0 0 8px", color: "var(--bba-text-main)" }}>
+                    <h3 style={{ fontSize: isMobile ? "18px" : "20px", fontWeight: 800, margin: "0 0 8px", color: "var(--bba-text-main)" }}>
                       {test.title}
                     </h3>
                     <p style={{ 
@@ -221,7 +230,9 @@ export default function TestsPage() {
                     borderTop: `1px solid var(--bba-border)`,
                     display: "flex",
                     justifyContent: "space-between",
-                    alignItems: "center"
+                    alignItems: isMobile ? "flex-start" : "center",
+                    flexDirection: isMobile ? "column" : "row",
+                    gap: isMobile ? "8px" : "0"
                   }}>
                     <div style={{ display: "flex", gap: "12px", color: "var(--bba-text-muted)", fontSize: "12px", fontWeight: 700 }}>
                        <span>⏱️ 90 daqiqa</span>

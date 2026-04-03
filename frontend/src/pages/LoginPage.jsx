@@ -60,10 +60,10 @@ export default function LoginPage() {
   return (
     <div className="bg-[#f8fafb] text-[#191c1d] min-h-screen flex flex-col font-['Inter']">
       {/* Header Logo Area */}
-      <header className="fixed top-0 w-full z-50 flex justify-between items-center px-8 py-6 bg-[#f8fafb]/80 backdrop-blur-xl">
+      <header className="fixed top-0 w-full z-50 flex justify-between items-center px-4 md:px-8 py-4 md:py-6 bg-[#f8fafb]/80 backdrop-blur-xl">
         <div className="flex items-center gap-3">
           <span className="material-symbols-outlined text-[#00425e] text-3xl">account_balance</span>
-          <span className="text-xl font-extrabold text-[#00425e] tracking-tight font-heading">BBA tizimi</span>
+          <span className="text-lg md:text-xl font-extrabold text-[#00425e] tracking-tight font-heading">BBA tizimi</span>
         </div>
         <div className="hidden md:flex gap-8 items-center text-sm font-medium text-slate-600">
           <span className="hover:text-[#00425e] transition-colors cursor-pointer">Imtihonlar</span>
@@ -74,12 +74,12 @@ export default function LoginPage() {
         </div>
       </header>
 
-      <main className="flex-grow flex items-center justify-center px-4 pt-24 pb-12 relative overflow-hidden">
+      <main className="flex-grow flex items-center justify-center px-3 md:px-4 pt-20 md:pt-24 pb-8 md:pb-12 relative overflow-hidden">
         {/* Abstract Background Elements */}
         <div className="absolute top-[-10%] right-[-10%] w-[40vw] h-[40vw] rounded-full bg-[#8ecef7]/20 blur-[120px]"></div>
         <div className="absolute bottom-[-10%] left-[-10%] w-[30vw] h-[30vw] rounded-full bg-[#8df5e4]/20 blur-[100px]"></div>
 
-        <div className="w-full max-w-[1100px] grid md:grid-cols-2 gap-0 overflow-hidden rounded-[2rem] shadow-[32px_0_64px_-20px_rgba(0,0,0,0.05)] bg-white">
+        <div className="w-full max-w-[1100px] grid md:grid-cols-2 gap-0 overflow-hidden rounded-2xl md:rounded-[2rem] shadow-[32px_0_64px_-20px_rgba(0,0,0,0.05)] bg-white">
           {/* Visual Editorial Side */}
           <div className="hidden md:flex flex-col justify-between p-12 bg-[#00425e] relative">
             <div className="absolute inset-0 opacity-20 pointer-events-none">
@@ -106,19 +106,19 @@ export default function LoginPage() {
           </div>
 
           {/* Form Side */}
-          <div className="p-8 md:p-16 flex flex-col justify-center">
-            <div className="mb-10">
-              <h1 className="text-3xl font-extrabold text-[#191c1d] font-headline mb-2">Xush kelibsiz</h1>
+          <div className="p-5 sm:p-8 md:p-16 flex flex-col justify-center">
+            <div className="mb-8 md:mb-10">
+              <h1 className="text-2xl md:text-3xl font-extrabold text-[#191c1d] font-headline mb-2">Xush kelibsiz</h1>
               <p className="text-[#40484e] text-sm font-body">Tizimga kirish uchun ma'lumotlaringizni kiriting</p>
             </div>
 
-            <form className="space-y-6" onSubmit={handleSubmit}>
+            <form className="space-y-5 md:space-y-6" onSubmit={handleSubmit}>
               <div className="space-y-2">
                 <label className="block text-xs font-bold text-[#40484e] uppercase tracking-wider ml-1">Foydalanuvchi nomi yoki Email</label>
                 <div className="relative group">
                   <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-[#70787e] group-focus-within:text-[#00425e] transition-colors">alternate_email</span>
                   <input 
-                    className="w-full pl-12 pr-4 py-4 rounded-xl bg-[#f2f4f5] border-none focus:ring-2 focus:ring-[#00425e]/20 focus:bg-white transition-all text-[#191c1d] placeholder:text-[#70787e]/60" 
+                    className="w-full pl-12 pr-4 py-3.5 md:py-4 rounded-xl bg-[#f2f4f5] border-none focus:ring-2 focus:ring-[#00425e]/20 focus:bg-white transition-all text-[#191c1d] placeholder:text-[#70787e]/60" 
                     placeholder="misol@scholar.uz" 
                     type="text" 
                     value={email}
@@ -136,7 +136,7 @@ export default function LoginPage() {
                 <div className="relative group">
                   <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-[#70787e] group-focus-within:text-[#00425e] transition-colors">lock</span>
                   <input 
-                    className="w-full pl-12 pr-4 py-4 rounded-xl bg-[#f2f4f5] border-none focus:ring-2 focus:ring-[#00425e]/20 focus:bg-white transition-all text-[#191c1d] placeholder:text-[#70787e]/60" 
+                    className="w-full pl-12 pr-4 py-3.5 md:py-4 rounded-xl bg-[#f2f4f5] border-none focus:ring-2 focus:ring-[#00425e]/20 focus:bg-white transition-all text-[#191c1d] placeholder:text-[#70787e]/60" 
                     placeholder="••••••••" 
                     type={showPassword ? "text" : "password"} 
                     value={password}
@@ -154,13 +154,13 @@ export default function LoginPage() {
 
               {error && <div className="text-red-500 text-xs font-bold text-center bg-red-50 py-3 rounded-xl">{error}</div>}
 
-              <button type="submit" className="w-full py-4 bg-[#00425e] text-white rounded-xl font-bold text-base shadow-lg shadow-slate-900/10 hover:opacity-90 active:scale-[0.98] transition-all flex items-center justify-center gap-2">
+              <button type="submit" className="w-full py-3.5 md:py-4 bg-[#00425e] text-white rounded-xl font-bold text-base shadow-lg shadow-slate-900/10 hover:opacity-90 active:scale-[0.98] transition-all flex items-center justify-center gap-2">
                 Kirish
                 <span className="material-symbols-outlined text-xl">arrow_forward</span>
               </button>
             </form>
 
-            <div className="relative my-10 text-center">
+            <div className="relative my-7 md:my-10 text-center">
               <div className="absolute inset-0 flex items-center">
                 <div className="w-full border-t border-[#e6e8e9]"></div>
               </div>
@@ -171,7 +171,7 @@ export default function LoginPage() {
               <button 
                 onClick={() => loginWithGoogle()}
                 disabled={googleLoading}
-                className="w-full py-4 bg-[#f2f4f5] border border-transparent hover:border-[#c0c7ce] rounded-xl font-semibold text-sm text-[#191c1d] flex items-center justify-center gap-3 transition-all active:scale-[0.99]"
+                className="w-full py-3.5 md:py-4 bg-[#f2f4f5] border border-transparent hover:border-[#c0c7ce] rounded-xl font-semibold text-sm text-[#191c1d] flex items-center justify-center gap-3 transition-all active:scale-[0.99]"
               >
                 <svg className="w-5 h-5" viewBox="0 0 24 24">
                   <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"></path>
@@ -183,7 +183,7 @@ export default function LoginPage() {
               </button>
             </div>
 
-            <p className="mt-10 text-center text-sm font-medium text-[#40484e]">
+            <p className="mt-8 md:mt-10 text-center text-sm font-medium text-[#40484e]">
               Hali ro'yxatdan o'tmaganmisiz? 
               <Link to="/register" className="text-[#00425e] font-bold ml-1 hover:underline">Ro'yxatdan o'tish</Link>
             </p>
@@ -192,11 +192,11 @@ export default function LoginPage() {
       </main>
 
       {/* Footer Content */}
-      <footer className="w-full bg-[#f8fafb] px-12 py-8 mt-auto flex flex-col md:flex-row justify-between items-center border-t border-slate-100">
-        <div className="text-xs font-['Inter'] tracking-wide text-slate-500 mb-4 md:mb-0">
+      <footer className="w-full bg-[#f8fafb] px-4 md:px-12 py-6 md:py-8 mt-auto flex flex-col md:flex-row justify-between items-center border-t border-slate-100">
+        <div className="text-xs text-center md:text-left font-['Inter'] tracking-wide text-slate-500 mb-4 md:mb-0">
           © 2024 National Certification Board. All Rights Reserved.
         </div>
-        <div className="flex gap-8">
+        <div className="flex gap-4 md:gap-8 flex-wrap justify-center">
           <button className="text-xs font-medium text-slate-400 hover:text-[#00425e] transition-opacity">Privacy Policy</button>
           <button className="text-xs font-medium text-slate-400 hover:text-[#00425e] transition-opacity">Terms of Service</button>
           <button className="text-xs font-medium text-slate-400 hover:text-[#00425e] transition-opacity">Help Center</button>
